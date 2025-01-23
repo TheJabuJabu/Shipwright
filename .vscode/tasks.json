@@ -110,6 +110,28 @@
                 "$msCompile",
                 "$gcc"
             ]
-        }
+        },
+        {
+            "label": "Launch SOH",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "(taskkill /F /IM soh.exe 2>nul || echo Process not running) && start .\\x64\\Debug\\soh.exe"
+            ],
+            "dependsOn": [],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Launch SOH",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "start .\\x64\\Debug\\soh.exe"
+            ],
+            "dependsOn": ["Build Project"],
+            "problemMatcher": []
+        }        
     ]
 }
