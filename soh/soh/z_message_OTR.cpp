@@ -13,6 +13,7 @@ extern "C" MessageTableEntry* sNesMessageEntryTablePtr;
 extern "C" MessageTableEntry* sGerMessageEntryTablePtr;
 extern "C" MessageTableEntry* sFraMessageEntryTablePtr;
 extern "C" MessageTableEntry* sStaffMessageEntryTablePtr;
+extern "C" MessageTableEntry* sOtherMessageEntryTablePtr;
 //extern "C" MessageTableEntry* _message_0xFFFC_nes;	
 
 static void SetMessageEntry(MessageTableEntry& entry, const SOH::MessageEntry& msgEntry) {
@@ -133,6 +134,30 @@ extern "C" void OTRMessage_Init()
         // Assert staff credits start at the first credits ID
         assert(sStaffMessageEntryTablePtr[0].textId == 0x0500);
     }
+
+    if (sOtherMessageEntryTablePtr == NULL && sNesMessageEntryTablePtr != NULL) {
+        // Count entries in NES table
+        size_t count = 0;
+        MessageTableEntry* entry = sNesMessageEntryTablePtr;
+        while (entry->textId != 0xFFFF) {
+            count++;
+            entry++;
+        }
+        count++; // Include terminator entry
+
+        // Allocate and copy entries
+        sOtherMessageEntryTablePtr = (MessageTableEntry*)malloc(sizeof(MessageTableEntry) * count);
+        for (size_t i = 0; i < count; i++) {
+            sOtherMessageEntryTablePtr[i].textId = sNesMessageEntryTablePtr[i].textId;
+            sOtherMessageEntryTablePtr[i].typePos = sNesMessageEntryTablePtr[i].typePos;
+
+            const char* seg = sNesMessageEntryTablePtr[i].segment;
+            sOtherMessageEntryTablePtr[i].segment = seg;
+            sOtherMessageEntryTablePtr[i].msgSize = sNesMessageEntryTablePtr[i].msgSize;
+        }
+    }
+
+    sNesMessageEntryTablePtr = sOtherMessageEntryTablePtr;
 
     CustomMessageManager::Instance->AddCustomMessageTable(customMessageTableID);
     CustomMessageManager::Instance->CreateGetItemMessage(

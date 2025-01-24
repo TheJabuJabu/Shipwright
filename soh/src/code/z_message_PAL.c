@@ -41,6 +41,7 @@ MessageTableEntry* sNesMessageEntryTablePtr = NULL;
 MessageTableEntry* sGerMessageEntryTablePtr = NULL;
 MessageTableEntry* sFraMessageEntryTablePtr = NULL;
 MessageTableEntry* sStaffMessageEntryTablePtr = NULL;
+MessageTableEntry* sOtherMessageEntryTablePtr = NULL;
 
 char* _message_0xFFFC_nes;
 
@@ -741,7 +742,6 @@ f32 sFontWidths[144] = {
     10.0f, // '~'
     10.0f, // '‾'
     12.0f, // 'À'
-    6.0f,  // 'î'
     12.0f, // 'Â'
     12.0f, // 'Ä'
     11.0f, // 'Ç'

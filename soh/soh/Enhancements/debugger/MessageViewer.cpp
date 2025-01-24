@@ -108,6 +108,7 @@ extern "C" MessageTableEntry* sNesMessageEntryTablePtr;
 extern "C" MessageTableEntry* sGerMessageEntryTablePtr;
 extern "C" MessageTableEntry* sFraMessageEntryTablePtr;
 extern "C" MessageTableEntry* sStaffMessageEntryTablePtr;
+extern "C" MessageTableEntry* sOtherMessageEntryTablePtr;
 
 void FindMessage(PlayState* play, const uint16_t textId, const uint8_t language) {
     const char* foundSeg;
