@@ -104,6 +104,18 @@ MessageTableEntry* OTRMessage_LoadTable(const std::string& filePath, bool isNES)
     return table;
 }
 
+// Utility function to replace a substring within a C-string
+void ReplaceSubstring(char* original, const char* oldSubstr, const char* newSubstr) {
+    char* found = strstr(original, oldSubstr);
+    if (found) {
+        size_t oldLen = strlen(oldSubstr);
+        size_t newLen = strlen(newSubstr);
+        size_t tailLen = strlen(found + oldLen) + 1;
+        memmove(found + newLen, found + oldLen, tailLen);
+        memcpy(found, newSubstr, newLen);
+    }
+}
+
 static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTable) {
     // Count entries in NES table
     size_t count = 0;
@@ -123,18 +135,8 @@ static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTab
         const char* seg = sourceTable[i].segment;
 
         if(sourceTable[i].textId == 4253) {
-            const char* oldWord = "Hyrule";
-            const char* newWord = "World";
-            const size_t oldLen = strlen(oldWord);
-            const size_t newLen = strlen(newWord);
-            
             char* newSeg = strdup(seg);
-            char* found = strstr(newSeg, oldWord);
-            if (found) {
-                memmove(found + newLen, found + oldLen, strlen(found + oldLen) + 1);
-                memcpy(found, newWord, newLen);
-            }
-            
+            ReplaceSubstring(newSeg, "Hyrule", "World");
             otherTable[i].segment = newSeg;
             otherTable[i].msgSize = strlen(newSeg);
         } else {
