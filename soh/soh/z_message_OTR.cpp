@@ -154,15 +154,20 @@ extern "C" void OTRMessage_Init()
             const char* seg = sNesMessageEntryTablePtr[i].segment;
 
             if(sNesMessageEntryTablePtr[i].textId == 4253) {
-                const char *addWord = "hello this is a test";
-                size_t addWordLen = strlen(addWord);
-                size_t origLen = sNesMessageEntryTablePtr[i].msgSize;
-                char* newSeg = (char*)malloc(addWordLen + origLen + 1);
-                memcpy(newSeg, addWord, addWordLen);
-                memcpy(newSeg + addWordLen, seg, origLen);
-                newSeg[addWordLen + origLen] = '\0';
+                const char* oldWord = "Hyrule";
+                const char* newWord = "World";
+                const size_t oldLen = strlen(oldWord);
+                const size_t newLen = strlen(newWord);
+                
+                char* newSeg = strdup(seg);
+                char* found = strstr(newSeg, oldWord);
+                if (found) {
+                    memmove(found + newLen, found + oldLen, strlen(found + oldLen) + 1);
+                    memcpy(found, newWord, newLen);
+                }
+                
                 sOtherMessageEntryTablePtr[i].segment = newSeg;
-                sOtherMessageEntryTablePtr[i].msgSize = addWordLen + origLen;
+                sOtherMessageEntryTablePtr[i].msgSize = strlen(newSeg);
             } else {
                 sOtherMessageEntryTablePtr[i].segment = seg;
                 sOtherMessageEntryTablePtr[i].msgSize = sNesMessageEntryTablePtr[i].msgSize;
