@@ -145,6 +145,9 @@ static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTab
     }
     count++; // Include terminator entry
 
+    // Define replacement strings
+    vector<string> replacements = {"hello", "jabujabu", "booya"};
+
     // Allocate and copy entries
     MessageTableEntry* otherTable = (MessageTableEntry*)malloc(sizeof(MessageTableEntry) * count);
     for (size_t i = 0; i < count; i++) {
@@ -155,7 +158,12 @@ static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTab
         if(sourceTable[i].textId == 4253) {
             vector<string> parts = splitSegmentByControlCharacter(seg);
             char* newSeg = strdup(seg);
-            ReplaceSubstring(newSeg, parts[0].c_str(), "JabuJabu");
+            
+            // Replace each part with corresponding replacement string
+            for (size_t j = 0; j < parts.size() && j < replacements.size(); j++) {
+                ReplaceSubstring(newSeg, parts[j].c_str(), replacements[j].c_str());
+            }
+            
             otherTable[i].segment = newSeg;
             otherTable[i].msgSize = strlen(newSeg);
         } else {
