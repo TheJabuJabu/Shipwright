@@ -104,6 +104,48 @@ MessageTableEntry* OTRMessage_LoadTable(const std::string& filePath, bool isNES)
     return table;
 }
 
+static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTable) {
+    // Count entries in NES table
+    size_t count = 0;
+    MessageTableEntry* entry = sourceTable;
+    while (entry->textId != 0xFFFF) {
+        count++;
+        entry++;
+    }
+    count++; // Include terminator entry
+
+    // Allocate and copy entries
+    MessageTableEntry* otherTable = (MessageTableEntry*)malloc(sizeof(MessageTableEntry) * count);
+    for (size_t i = 0; i < count; i++) {
+        otherTable[i].textId = sourceTable[i].textId;
+        otherTable[i].typePos = sourceTable[i].typePos;
+
+        const char* seg = sourceTable[i].segment;
+
+        if(sourceTable[i].textId == 4253) {
+            const char* oldWord = "Hyrule";
+            const char* newWord = "World";
+            const size_t oldLen = strlen(oldWord);
+            const size_t newLen = strlen(newWord);
+            
+            char* newSeg = strdup(seg);
+            char* found = strstr(newSeg, oldWord);
+            if (found) {
+                memmove(found + newLen, found + oldLen, strlen(found + oldLen) + 1);
+                memcpy(found, newWord, newLen);
+            }
+            
+            otherTable[i].segment = newSeg;
+            otherTable[i].msgSize = strlen(newSeg);
+        } else {
+            otherTable[i].segment = seg;
+            otherTable[i].msgSize = sourceTable[i].msgSize;
+        }
+    }
+
+    return otherTable;
+}
+
 extern "C" void OTRMessage_Init()
 {
     // OTRTODO: Added a lot of null checks here so that we don't malloc the table multiple times causing a memory leak.
@@ -136,43 +178,7 @@ extern "C" void OTRMessage_Init()
     }
 
     if (sOtherMessageEntryTablePtr == NULL && sNesMessageEntryTablePtr != NULL) {
-        // Count entries in NES table
-        size_t count = 0;
-        MessageTableEntry* entry = sNesMessageEntryTablePtr;
-        while (entry->textId != 0xFFFF) {
-            count++;
-            entry++;
-        }
-        count++; // Include terminator entry
-
-        // Allocate and copy entries
-        sOtherMessageEntryTablePtr = (MessageTableEntry*)malloc(sizeof(MessageTableEntry) * count);
-        for (size_t i = 0; i < count; i++) {
-            sOtherMessageEntryTablePtr[i].textId = sNesMessageEntryTablePtr[i].textId;
-            sOtherMessageEntryTablePtr[i].typePos = sNesMessageEntryTablePtr[i].typePos;
-
-            const char* seg = sNesMessageEntryTablePtr[i].segment;
-
-            if(sNesMessageEntryTablePtr[i].textId == 4253) {
-                const char* oldWord = "Hyrule";
-                const char* newWord = "World";
-                const size_t oldLen = strlen(oldWord);
-                const size_t newLen = strlen(newWord);
-                
-                char* newSeg = strdup(seg);
-                char* found = strstr(newSeg, oldWord);
-                if (found) {
-                    memmove(found + newLen, found + oldLen, strlen(found + oldLen) + 1);
-                    memcpy(found, newWord, newLen);
-                }
-                
-                sOtherMessageEntryTablePtr[i].segment = newSeg;
-                sOtherMessageEntryTablePtr[i].msgSize = strlen(newSeg);
-            } else {
-                sOtherMessageEntryTablePtr[i].segment = seg;
-                sOtherMessageEntryTablePtr[i].msgSize = sNesMessageEntryTablePtr[i].msgSize;
-            }
-        }
+        sOtherMessageEntryTablePtr = PopulateOtherMessageTable(sNesMessageEntryTablePtr);
     }
 
     sNesMessageEntryTablePtr = sOtherMessageEntryTablePtr;
