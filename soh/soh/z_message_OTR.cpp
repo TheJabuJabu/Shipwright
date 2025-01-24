@@ -110,7 +110,21 @@ MessageTableEntry* OTRMessage_LoadTable(const std::string& filePath, bool isNES)
 }
 
 // Utility function to replace a substring within a C-string
+static bool ContainsControlChars(const char* str) {
+    while (*str) {
+        if (static_cast<unsigned char>(*str) < 32) {
+            return true;
+        }
+        str++;
+    }
+    return false;
+}
+
 void ReplaceSubstring(char* original, const char* oldSubstr, const char* newSubstr) {
+    if (ContainsControlChars(oldSubstr)) {
+        // Skip replacement if oldSubstr contains control characters
+        return;
+    }
     char* found = strstr(original, oldSubstr);
     if (found) {
         size_t oldLen = strlen(oldSubstr);
