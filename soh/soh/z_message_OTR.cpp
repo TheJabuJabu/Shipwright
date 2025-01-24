@@ -8,6 +8,11 @@
 #include <message_data_static.h>
 #include "Enhancements/custom-message/CustomMessageManager.h"
 #include "Enhancements/custom-message/CustomMessageTypes.h"
+#include <vector>
+#include <string>
+
+using std::vector;
+using std::string;
 
 extern "C" MessageTableEntry* sNesMessageEntryTablePtr;
 extern "C" MessageTableEntry* sGerMessageEntryTablePtr;
@@ -116,9 +121,9 @@ void ReplaceSubstring(char* original, const char* oldSubstr, const char* newSubs
     }
 }
 
-std::vector<std::string> splitSegmentByControlCharacter(const std::string& segment) {
-    const char token[] = " ";
-    std::vector<std::string> result;
+vector<string> splitSegmentByControlCharacter(const string& segment) {
+    const char token[] = "\f";
+    vector<string> result;
     size_t start = 0;
     size_t end = segment.find(token);
     while (end != std::string::npos) {
@@ -148,7 +153,7 @@ static MessageTableEntry* PopulateOtherMessageTable(MessageTableEntry* sourceTab
 
         const char* seg = sourceTable[i].segment;
         if(sourceTable[i].textId == 4253) {
-            std::vector<std::string> parts = splitSegmentByControlCharacter(seg);
+            vector<string> parts = splitSegmentByControlCharacter(seg);
             char* newSeg = strdup(seg);
             ReplaceSubstring(newSeg, parts[0].c_str(), "JabuJabu");
             otherTable[i].segment = newSeg;
