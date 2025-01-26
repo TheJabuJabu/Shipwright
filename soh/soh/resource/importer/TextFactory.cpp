@@ -1,6 +1,9 @@
 #include "soh/resource/importer/TextFactory.h"
 #include "soh/resource/type/Text.h"
 #include "spdlog/spdlog.h"
+#include <nlohmann/json.hpp>
+#include <Json.h>
+// #include <libultraship/classes.h>
 
 namespace SOH {
 std::shared_ptr<Ship::IResource> ResourceFactoryBinaryTextV0::ReadResource(std::shared_ptr<Ship::File> file) {
@@ -25,6 +28,22 @@ std::shared_ptr<Ship::IResource> ResourceFactoryBinaryTextV0::ReadResource(std::
     }
 
     return text;
+}
+
+std::shared_ptr<Ship::IResource> ResourceFactoryBinaryJsonV0::ReadResource(std::shared_ptr<Ship::File> file) {
+    if (!FileHasValidFormatAndReader(file)) { 
+        return nullptr;
+    }
+
+    auto json = std::make_shared<Ship::Json>(file->InitData);
+    auto reader = std::get<std::shared_ptr<BinaryReader>>(file->Reader);
+
+    json->DataSize = file->Buffer->size();
+    json->Data = nlohmann::json::parse(reader->ReadCString(), nullptr, true, true);
+
+    // todo: Populate text data, return text array
+
+    return json;
 }
 
 std::shared_ptr<Ship::IResource> ResourceFactoryXMLTextV0::ReadResource(std::shared_ptr<Ship::File> file) {

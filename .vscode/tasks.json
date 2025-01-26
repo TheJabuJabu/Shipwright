@@ -18,7 +18,10 @@
                 "x64"
             ],
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher": [
+                "$msCompile",
+                "$cmake"
+            ]
         },
         {
             "label": "Generate SOH OTR",
@@ -31,7 +34,10 @@
                 "GenerateSohOtr"
             ],
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ]
         },
         {
             "label": "Build Project",
@@ -46,7 +52,10 @@
                 "isDefault": true
             },
             "dependsOn": ["Generate SOH OTR"],
-            "problemMatcher": []
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ]
         },
         {
             "label": "Build All",
@@ -55,7 +64,74 @@
                 "Setup CMake Project",
                 "Generate SOH OTR",
                 "Build Project"
+            ],
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ]            
+        },
+        {
+            "label": "Build OTRExporter (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "./build/x64",
+                "--config",
+                "Debug",
+                "--target",
+                "OTRExporter",
+                "-j",
+                "14"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
             ]
-        }
+        },
+        {
+            "label": "Build ZAPD (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "./build/x64",
+                "--config",
+                "Debug",
+                "--target",
+                "ZAPD",
+                "-j",
+                "14"
+            ],
+            "group": "build",
+            "dependsOn": ["Build OTRExporter (Debug)"],
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Launch SOH",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "(taskkill /F /IM soh.exe || echo Process not running) && start .\\x64\\Debug\\soh.exe"
+            ],
+            "dependsOn": [],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Launch SOH",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "start .\\x64\\Debug\\soh.exe"
+            ],
+            "dependsOn": ["Build Project"],
+            "problemMatcher": []
+        }        
     ]
 }
