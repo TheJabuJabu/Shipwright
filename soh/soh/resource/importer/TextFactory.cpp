@@ -2,7 +2,6 @@
 #include "soh/resource/type/Text.h"
 #include "spdlog/spdlog.h"
 #include <nlohmann/json.hpp>
-#include <Json.h>
 // #include <libultraship/classes.h>
 
 namespace SOH {
@@ -31,19 +30,27 @@ std::shared_ptr<Ship::IResource> ResourceFactoryBinaryTextV0::ReadResource(std::
 }
 
 std::shared_ptr<Ship::IResource> ResourceFactoryBinaryJsonV0::ReadResource(std::shared_ptr<Ship::File> file) {
-    if (!FileHasValidFormatAndReader(file)) { 
+    if (!FileHasValidFormatAndReader(file)) {
         return nullptr;
     }
 
-    auto json = std::make_shared<Ship::Json>(file->InitData);
-    auto reader = std::get<std::shared_ptr<BinaryReader>>(file->Reader);
+    auto text = std::make_shared<Text>(file->InitData);
+    auto binaryReader = std::get<std::shared_ptr<Ship::BinaryReader>>(file->Reader);
 
-    json->DataSize = file->Buffer->size();
-    json->Data = nlohmann::json::parse(reader->ReadCString(), nullptr, true, true);
+    auto jsonReader = std::make_shared<nlohmann::json>();
+    jsonReader->parse(binaryReader->ReadCString().data());
 
-    // todo: Populate text data, return text array
+    // for (uint32_t i = 0; i < msgCount; i++) {
+    //     MessageEntry entry;
+    //     entry.id = reader->ReadUInt16();
+    //     entry.textboxType = reader->ReadUByte();
+    //     entry.textboxYPos = reader->ReadUByte();
+    //     entry.msg = reader->ReadString();
 
-    return json;
+    //     text->messages.push_back(entry);
+    // }
+
+    return text;
 }
 
 std::shared_ptr<Ship::IResource> ResourceFactoryXMLTextV0::ReadResource(std::shared_ptr<Ship::File> file) {
